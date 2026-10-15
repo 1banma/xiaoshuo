@@ -27,7 +27,7 @@ OPENER = urllib.request.build_opener(
     urllib.request.HTTPSHandler(context=CTX)
 )
 
-BASE = 'http://txt.bequgew.cc/txt{n}.html'
+BASE = 'http://www.bequgew.cc/txt{n}.html'
 
 def head_one(n):
     url = BASE.format(n=n)
@@ -46,23 +46,23 @@ backoff = 20   # 起始间隔（秒），200/hour = 18s，留余量
 for n in range(start_n, end_n):
     try:
         fid, size, name = head_one(n)
+        print(f"  #{n} fid={'YES' if fid else 'EMPTY'} size={size}")
         if fid:
             results[str(n)] = {'fid': fid, 'size': size, 'name': name}
             n429 = 0           # 成功则重置退避
             backoff = 20
         time.sleep(backoff)
     except urllib.error.HTTPError as e:
+        print(f"  HTTP {e.code} at #{n}")
         if e.code == 429:
             n429 += 1
-            # 渐进退避：每次 429 多等 30 秒，最多 180 秒
             backoff = min(20 + n429 * 30, 180)
-            print(f"  429 at #{n}, backoff={backoff}s")
             time.sleep(backoff)
         else:
-            time.sleep(backoff)
+            time.sleep(5)
     except Exception as e:
-        print(f"  ERR #{n}: {e}")
-        time.sleep(backoff)
+        print(f"  ERR #{n}: {type(e).__name__}: {e}")
+        time.sleep(5)
 
     # 每 50 本打印进度
     if (n - start_n + 1) % 50 == 0:
