@@ -1,0 +1,28 @@
+name: test-access
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test bequgew access
+        run: |
+          echo "=== www.bequgew.cc ==="
+          curl -sI -o /dev/null -w "HTTP %{http_code} ip=%{remote_ip}\n" http://www.bequgew.cc/txt1.html
+          curl -sI http://www.bequgew.cc/txt1.html 2>&1 | head -20
+          echo ""
+          echo "=== txt.bequgew.cc ==="
+          curl -sI -o /dev/null -w "HTTP %{http_code} ip=%{remote_ip}\n" http://txt.bequgew.cc/txt1.html
+          curl -sI http://txt.bequgew.cc/txt1.html 2>&1 | head -20
+          echo ""
+          echo "=== 172.247.240.88 ==="
+          curl -sI -o /dev/null -w "HTTP %{http_code}\n" http://172.247.240.88/txt1.html --max-time 10
+          echo ""
+          echo "=== B2 direct ==="
+          curl -sI -o /dev/null -w "HTTP %{http_code}\n" "https://f004.backblazeb2.com/b2api/v2/b2_download_file_by_id?fileId=4_zebe96c80a014975e90a90714_f102b621bb53c9034_d20260131_m082956_c004_v0402033_t0005_u01769848196613"
+          echo ""
+          echo "=== my IP ==="
+          curl -s https://ifconfig.me; echo
+          curl -s https://api.ipify.org; echo
